@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>File Contents</title>
+	<script>
+		function toggleFile() {
+			var fileContentsElement = document.getElementById("file-contents");
+			var fileContents = fileContentsElement.textContent;
+			
+			if (fileContents === '0') {
+				fileContentsElement.textContent = '1';
+			} else {
+				fileContentsElement.textContent = '0';
+			}
+			
+			// Send the updated file contents to the server
+			var xhr = new XMLHttpRequest();
+			xhr.open("POST", "update-file.php", true);
+			xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+			xhr.onreadystatechange = function() {
+				if (xhr.readyState === 4 && xhr.status === 200) {
+					// Show the "File updated" message
+					var fileUpdatedMsg = document.getElementById("file-updated-msg");
+					fileUpdatedMsg.style.display = "block";
+				}
+			};
+			xhr.send("fileContents=" + encodeURIComponent(fileContents));
+		}
+	</script>
+</head>
+<body>
+	<p>File contents:</p>
+	<span id="file-contents"></span>
+	
+	<script>
+		// Retrieve the file contents and set the initial value
+		var fileContentsElement = document.getElementById("file-contents");
+		var initialFileContents = "0"; // Default initial value
+		fileContentsElement.textContent = initialFileContents;
+		
+		// Fetch the initial file contents from the server
+		var xhr = new XMLHttpRequest();
+		xhr.onreadystatechange = function() {
+			if (xhr.readyState === 4 && xhr.status === 200) {
+				var response = xhr.responseText;
+				fileContentsElement.textContent = response;
+			}
+		};
+		xhr.open("GET", "file-contents.php", true);
+		xhr.send();
+	</script>
+	
+	<p>Toggle file:</p>
+	<button onclick="toggleFile()">Toggle</button>
+	
+	<p id="file-updated-msg" style="display: none;">File updated</p>
+</body>
+</html>
